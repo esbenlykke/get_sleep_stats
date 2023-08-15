@@ -1,0 +1,24 @@
+{
+    "id": "BF3A9C54",
+    "path": "~/projects/get_sleep_stats/calculate_stats.R",
+    "project_path": "calculate_stats.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1692103401605.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Sourcedfi6qinx422b"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1692103079,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1692103079,
+    "read_only": false,
+    "read_only_alternatives": []
+}
