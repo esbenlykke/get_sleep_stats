@@ -91,7 +91,7 @@ process_temp_parquet <- function(temp_file, output_file) {
     write_parquet(output_file)
 }
 
-
-walk2(temp_files, output_files, ~ process_temp_parquet(.x, .y), .progress = TRUE)
-
-cat(glue("\n{length(warnings())} warnings generated. Warnings are typically generated when no in-bed time is found on a given night...\n"))
+suppressWarnings(
+  walk2(temp_files, output_files, ~ process_temp_parquet(.x, .y), .progress = TRUE)
+)
+# cat(glue("\n{length(warnings())} warnings generated. Warnings are typically generated when no in-bed time is found on a given night...\n"))

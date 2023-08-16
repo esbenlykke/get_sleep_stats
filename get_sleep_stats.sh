@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+# Start timer
+start_time=$(date +%s)
+
 # Check for correct number of arguments
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <path_to_cwa_files>"
+    echo "Usage: $0 <path/to/accelerometer/files>"
     exit 1
 fi
 
@@ -17,8 +20,17 @@ mkdir -p "$temp_path"
 mkdir -p "$output_path"
 mkdir -p "$stats_path"
 
+# Ask user for file type and wait for input
+echo "Please choose a file type (cwa or wav):"
+read file_type
+
+if [[ "$file_type" != "wav" && "$file_type" != "cwa" ]]; then
+    echo "Error: Invalid choice. Only 'cwa' or 'wav' are accepted."
+    exit 1
+fi
+
 # Process each split file
-./resample_and_extract_initial_features.R "$cwa_path"
+./resample_and_extract_initial_features.R "$cwa_path" "$file_type"
 
 # Merge processed files from temp and write to the output directory
 ./merge_and_extract_remaining_features.R "$temp_path" "$output_path"
@@ -28,3 +40,8 @@ mkdir -p "$stats_path"
 
 # Remove processed split files to prevent reuse in the next loop
 rm -rf "${temp_path}"
+
+# Stop timer and print elapsed time
+end_time=$(date +%s)
+elapsed_time=$(expr $end_time - $start_time)
+echo "Total runtime: $elapsed_time seconds"
