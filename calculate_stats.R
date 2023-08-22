@@ -23,23 +23,20 @@ create_stats <- function(preds_file, output_file) {
   id <- preds %>%
     distinct(id) %>%
     pull()
-  dates <- preds %>%
-    distinct(date(epoch)) %>%
-    pull()
+  
+  # dates <- preds %>%
+  #   distinct(date(epoch)) %>%
+  #   pull()
 
   to_bed <- preds %>%
     group_by(noon_day, month) %>%
-    filter(pred_asleep == 1) %>%
-    arrange(row_number()) %>%
-    pull(epoch) %>%
-    first()
+    slice(1) %>% 
+    pull(epoch)
 
   out_bed <- preds %>%
     group_by(noon_day, month) %>%
-    filter(pred_asleep == 1) %>%
-    arrange(row_number()) %>%
-    pull(epoch) %>%
-    last()
+    slice(n()) %>% 
+    pull(epoch)
 
   stats <-
     preds %>%
@@ -53,9 +50,11 @@ create_stats <- function(preds_file, output_file) {
     ) %>%
     select(spt_hrs:se_percent)
   
-  res <- list(id = id, dates = dates, tibble(to_bed = to_bed, out_bed = out_bed), stats = stats)
+  res <- list(id = id, in_bed_times = tibble(to_bed = to_bed, out_bed = out_bed), stats = stats)
   
   write_rds(res, output_file)
 }
+
+cat("Extracting sleep quality metrics... \n")
 
 walk2(preds_files, output_files, ~ create_stats(.x, .y))

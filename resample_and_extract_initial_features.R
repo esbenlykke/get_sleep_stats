@@ -29,7 +29,7 @@ files <-
   str_c(path, files_basenames)
 
 temp_files <-
-  str_replace_all(str_c(path, "temp/", files_basenames), str_c(".", file_type), ".parquet")
+  str_c(path, "temp/", str_replace(files_basenames, file_type, "parquet"))
 
 # The mean_crossing_rate function takes the signal as input and calculates
 # the mean crossing rate. It counts the number of times the signal crosses
@@ -40,9 +40,9 @@ mean_crossing_rate <- function(signal) {
   return(crossing_rate)
 }
 
-cat("\n Applying filter and calculating the first round of features.\n 
-    Progress bar will appear shortly\n 
-    This will take some time...\n")
+cat("\nApplying filter, calculating features from raw accerometry, and resampling.\n 
+Progress bar will appear shortly.\n 
+This will take some time...\n")
 
 process_file <- function(file, temp_file) {
   if (file_type == "cwa") {
@@ -50,7 +50,7 @@ process_file <- function(file, temp_file) {
     glue::glue("Extracting features for {file}...\n")
 
     raw <-
-      GGIRread::readAxivity(file, start = 1, end = 14400)
+      GGIRread::readAxivity(file, start = 1, end = 1e5)
 
     acc <-
       raw$data %>%
@@ -62,6 +62,7 @@ process_file <- function(file, temp_file) {
 
     sf <-
       raw$header$frequency
+    
   } else if (file_type == "wav") {
     # Processing specific to wav files
     glue::glue("Extracting features for {file}...\n")

@@ -16,7 +16,7 @@ output_path="${cwa_path}/output"
 stats_path="${cwa_path}/stats"
 
 # Create necessary directories if they don't exist
-mkdir -p "$temp_path"
+mkdir -p "$temp_path" 
 mkdir -p "$output_path"
 mkdir -p "$stats_path"
 
@@ -39,7 +39,8 @@ fi
 ./calculate_stats.R "$output_path" "$stats_path"
 
 # Remove processed split files to prevent reuse in the next loop
-rm -rf "${temp_path}"
+#rm -rf "${temp_path}"
+#rm -rf "${output_path}"
 
 # Stop timer and print elapsed time
 end_time=$(date +%s)
