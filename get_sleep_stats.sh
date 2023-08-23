@@ -33,7 +33,7 @@ fi
 ./resample_and_extract_initial_features.R "$cwa_path" "$file_type"
 
 # Merge processed files from temp and write to the output directory
-./merge_and_extract_remaining_features.R "$temp_path" "$output_path"
+./extract_remaining_features.R "$temp_path" "$output_path"
 
 # Calculate stats
 ./calculate_stats.R "$output_path" "$stats_path"
