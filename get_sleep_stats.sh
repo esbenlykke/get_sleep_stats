@@ -38,9 +38,9 @@ fi
 # Calculate stats
 ./calculate_stats.R "$output_path" "$stats_path"
 
-# Remove processed split files to prevent reuse in the next loop
-#rm -rf "${temp_path}"
-#rm -rf "${output_path}"
+# Cleanup
+rm -rf "${temp_path}"
+rm -rf "${output_path}"
 
 # Stop timer and print elapsed time
 end_time=$(date +%s)
