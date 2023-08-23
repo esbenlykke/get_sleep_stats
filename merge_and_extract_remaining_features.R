@@ -70,28 +70,28 @@ process_temp_parquet <- function(temp_file, output_file) {
         seq(0, 1, length.out = n()), 0
       )
     ) %>%
-    ungroup() %>%
+    ungroup() 
 
-  # in_bed_extract <-
-  #   xgb_in_bed %>%
-  #   augment(tbl) %>%
-  #   mutate(.pred_class = slide_dbl(as.numeric(.pred_class) - 1, median, .after = 15, .before = 15)) %>%
-  #   group_by(id, noon_day, month) %>%
-  #   group_modify(~ .x %>%
-  #     # Filter rows where row_number is within the in_bed_filtered range
-  #     filter(row_number() >= min(row_number()[.data$.pred_class == 1]) &
-  #       row_number() <= max(row_number()[.data$.pred_class == 1]))) %>%
-  #   ungroup() %>%
-  #   rename(pred_in_bed = .pred_class, pred_in_bed_yes = .pred_1, pred_in_bed_no = .pred_0) 
-  # 
-  # combined_predictions <-
-  #   xgb_sleep %>%
-  #   augment(in_bed_extract) %>%
-  #   rename(pred_asleep = .pred_class, pred_asleep_yes = .pred_1, pred_asleep_no = .pred_0) %>%
+  in_bed_extract <-
+    xgb_in_bed %>%
+    augment(tbl) %>%
+    mutate(.pred_class = slide_dbl(as.numeric(.pred_class) - 1, median, .after = 15, .before = 15)) %>%
+    group_by(id, noon_day, month) %>%
+    group_modify(~ .x %>%
+      # Filter rows where row_number is within the in_bed_filtered range
+      filter(row_number() >= min(row_number()[.data$.pred_class == 1]) &
+        row_number() <= max(row_number()[.data$.pred_class == 1]))) %>%
+    ungroup() %>%
+    rename(pred_in_bed = .pred_class, pred_in_bed_yes = .pred_1, pred_in_bed_no = .pred_0)
+
+  combined_predictions <-
+    xgb_sleep %>%
+    augment(in_bed_extract) %>%
+    rename(pred_asleep = .pred_class, pred_asleep_yes = .pred_1, pred_asleep_no = .pred_0) %>%
     write_parquet(output_file)
 }
 
 suppressWarnings(
   walk2(temp_files, output_files, ~ process_temp_parquet(.x, .y), .progress = TRUE)
 )
-# cat(glue("\n{length(warnings())} warnings generated. Warnings are typically generated when no in-bed time is found on a given night...\n"))
+# cat(glue("\n{length(warnings())} warnings generated. Warnings are generated when no in-bed time is found on a given night...\n"))
