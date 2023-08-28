@@ -18,7 +18,7 @@ temp_path <- args[1] # directory with temp parquet files
 dest <- args[2] # destination filename
 
 xgb_in_bed <-
-  read_rds("models/in_bed_median5_xgboost_30_sec_epoch_fit.rds")
+  read_rds("models/xgb_in_bed_fit.rds")
 
 xgb_sleep <-
   read_rds("models/xgb_sleep_fit.rds")

@@ -26,10 +26,10 @@ files_basenames <-
   str_subset(file_type)
 
 files <-
-  str_c(path, files_basenames)
+  file.path(path, files_basenames)
 
 temp_files <-
-  str_c(path, "temp/", str_replace(files_basenames, file_type, "parquet"))
+  file.path(path, "temp", str_replace(files_basenames, file_type, "parquet"))
 
 # The mean_crossing_rate function takes the signal as input and calculates
 # the mean crossing rate. It counts the number of times the signal crosses
@@ -47,7 +47,7 @@ This will take some time...\n")
 process_file <- function(file, temp_file) {
   if (file_type == "cwa") {
     # Processing specific to cwa files
-    glue::glue("Extracting features for {file}...\n")
+    cat(glue::glue("Extracting features for {file}...\n"))
 
     raw <-
       GGIRread::readAxivity(file, start = 1, end = 1e5)
@@ -65,7 +65,7 @@ process_file <- function(file, temp_file) {
     
   } else if (file_type == "wav") {
     # Processing specific to wav files
-    glue::glue("Extracting features for {file}...\n")
+    cat(glue::glue("Extracting features for {file}...\n"))
 
     raw <- GGIRread::readWav(file, start = 1, end = 14400, units = "minutes")
 
@@ -128,6 +128,8 @@ process_file <- function(file, temp_file) {
     write_parquet(temp_file)
 }
 
+walk2(files, temp_files, ~ process_file(.x, .y), .progress = TRUE)
+
 # plan(multisession, workers = 5)
 # 
 # future_walk2(files, temp_files, ~ process_file(.x, .y),
@@ -135,5 +137,3 @@ process_file <- function(file, temp_file) {
 # )
 # 
 # plan(sequential)
-
-walk2(files, temp_files, ~ process_file(.x, .y), .progress = TRUE)
