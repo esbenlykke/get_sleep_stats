@@ -38,15 +38,12 @@ process_temp_parquet <- function(temp_file, output_file) {
   cat(glue("Processing {str_remove(temp_file, temp_path)}...\n\n"))
   tbl <-
     read_parquet(temp_file) %>%
-    mutate(age = 8) %>% # TODO: remove this fake age when real data is available
     rowwise() %>%
     mutate(
       sd_max = max(c(x_sd, y_sd, z_sd))
     ) %>%
     group_by(id, noon_day, month) %>%
     mutate(
-      clock_group = if_else((hms::as_hms(epoch) > lubridate::hms("19:00:00") |
-        hms::as_hms(epoch) < lubridate::hms("10:00:00")), 1, 0),
       across(c(x, y, z), list(sd_long = ~ slider::slide_dbl(.x, sd, .after = 30))),
       across(x_sd_long:z_sd_long, ~ replace_na(.x, mean(.x, na.rm = TRUE))),
       across(c(incl, theta, temp_mean, x_sd, y_sd, z_sd), list(
@@ -57,18 +54,11 @@ process_temp_parquet <- function(temp_file, output_file) {
         lead_5min = ~ lead(.x, 10, default = mean(.x)), # Value from 5 minutes in the future
         lead_30min = ~ lead(.x, 60, default = mean(.x)) # Value from 30 minutes in the future
       )),
+      seconds_since_peak = hour(epoch) * 3600 + minute(epoch) * 60 + second(epoch) - (21 * 3600), # sets c-process peak at 19:00
+      clock_proxy_cos = cos(2 * pi * seconds_since_peak / (24 * 3600)),
+      weekday = wday(epoch - hours(12), label = FALSE, week_start = 1),
+      is_weekend = if_else(weekday %in% c(5, 6), 1, 0), # fri and sat night
       .after = sd_max
-    ) %>%
-    # Group the data by id, noon_day, month, and clock_group
-    group_by(id, noon_day, month, clock_group) %>%
-    # Create new features for clock_proxy_cos and clock_proxy_linear
-    mutate(
-      clock_proxy_cos = if_else(clock_group == 1,
-        cos(seq(-(pi / 2), pi / 2, length.out = n())), 0
-      ),
-      clock_proxy_linear = if_else(clock_group == 1,
-        seq(0, 1, length.out = n()), 0
-      )
     ) %>%
     ungroup() 
 

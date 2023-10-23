@@ -95,8 +95,7 @@ process_file <- function(file, temp_file) {
   # Create 4th order Butterworth low-pass 5 Hz filter
   bf <- signal::butter(4, 5 / (sf / 2), type = "low")
 
-  out <-
-    acc %>%
+  acc %>%
     mutate(
       epoch = floor_date(datetime, "30 seconds"),
       noon_day = day(epoch - hours(12)),
@@ -112,7 +111,6 @@ process_file <- function(file, temp_file) {
         mean = mean,
         sd = sd
       )),
-      weekday = wday(datetime, label = FALSE, week_start = 1),
       incl = 180 / pi * acos(y_mean / sqrt(x_mean^2 + y_mean^2 + z_mean^2)),
       theta = 180 / pi * asin(z_mean / sqrt(x_mean^2 + y_mean^2 + z_mean^2)),
       vector_magnitude = sqrt(x_mean^2 + y_mean^2 + z_mean^2),
